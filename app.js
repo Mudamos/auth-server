@@ -6,14 +6,14 @@ const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 const sassMiddleware = require("node-sass-middleware");
 
-const index = require("./src/routes/index");
-const users = require("./src/routes/users");
+const index = require("./src/web/routes/index");
+const users = require("./src/web/routes/users");
 
 const app = express();
 
 // view engine setup
-app.set("views", path.join(__dirname, "src/views"));
-app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "src/web/views"));
+app.set("view engine", "pug");
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, "public", "favicon.ico")));
