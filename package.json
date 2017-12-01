@@ -1,19 +1,34 @@
 {
   "name": "mudamos-auth-server",
   "version": "0.0.0",
+  "engines": {
+    "node": "8.9.0"
+  },
   "private": true,
   "scripts": {
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "bcrypt": "^1.0.3",
     "body-parser": "~1.18.2",
     "cookie-parser": "~1.4.3",
+    "cookie-session": "^2.0.0-beta.3",
+    "csurf": "^1.9.0",
     "debug": "~2.6.9",
+    "dotenv": "^4.0.0",
     "express": "~4.15.5",
+    "humps": "^2.0.1",
+    "lru-memoize": "^1.0.2",
     "morgan": "~1.9.0",
     "node-sass-middleware": "0.9.8",
+    "pg": "6.4.2",
+    "pg-hstore": "^2.3.2",
     "pug": "2.0.0-beta11",
-    "serve-favicon": "~2.4.5"
+    "ramda": "^0.25.0",
+    "sequelize": "^4.23.2",
+    "sequelize-cli": "^3.1.0",
+    "serve-favicon": "~2.4.5",
+    "winston": "^2.4.0"
   },
   "devDependencies": {
     "nodemon": "^1.12.1"

@@ -1,0 +1,18 @@
+extends ../layout
+
+block content
+  h1 login
+
+  div #{error}
+
+  form(method="POST")
+    div
+      label(for="email") Email:
+      input#email(type="email" name="email" value=email)
+
+    div
+      label(for="password") Password:
+      input#password(type="password" name="password" value=password)
+
+    div
+      button(type="submit") Entrar

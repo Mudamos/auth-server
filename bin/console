@@ -1,0 +1,77 @@
+#! /usr/bin/env node
+"use strict";
+
+require("dotenv").config({ silent: true });
+const fs = require("fs");
+const repl = require("repl");
+const ramda = require("ramda");
+const isFunction = ramda.is(Function);
+
+const promisedRepl = repl => {
+  const originalEval = repl.eval;
+
+  repl.eval = (cmd, context, filename, callback) => {
+    originalEval.call(repl, cmd, context, filename, (err, res) => {
+      if (err || !res || !isFunction(res.then)) {
+        callback(err, res);
+      } else {
+        res.then(val => callback(null, val)).catch(callback);
+      }
+    });
+  };
+
+  return repl;
+};
+
+const replServer = promisedRepl(repl.start({
+  prompt: "AUTH > ",
+}));
+
+const historyFile = "./.console-history";
+fs.closeSync(fs.openSync(historyFile, "a"));
+fs.readFileSync(historyFile)
+  .toString()
+  .split("\n")
+  .reverse()
+  .filter(line => line.trim())
+  .map(line => replServer.history.push(line));
+
+replServer.on("exit", () => {
+  fs.appendFileSync(historyFile, replServer.lines.join("\n") + "\n");
+  process.stdout.write("\n");
+  process.exit();
+});
+
+const config = require("../src/config")();
+const db = require("../src/db")(config);
+const tables = require("../src/tables")(db);
+
+const {
+  ClientRepository,
+  UserRepository,
+} = require("../src/repositories");
+
+const userRepository = UserRepository(db);
+const clientRepository = ClientRepository(db);
+
+const {
+  createUser,
+} = require("../src/use-cases");
+
+const {
+  log,
+} = require("../src/services");
+const logger = log(config);
+
+const models = require("../src/models");
+
+Object.keys(ramda).forEach(key => replServer.context[key] = ramda[key]);
+Object.keys(tables).forEach(key => replServer.context[key] = tables[key]);
+Object.keys(models).forEach(key => replServer.context[key] = models[key]);
+
+replServer.context.clientRepository = clientRepository;
+replServer.context.config = config;
+replServer.context.createUser = createUser({ userRepository });
+replServer.context.db = db;
+replServer.context.logger = logger;
+replServer.context.userRepository = userRepository;

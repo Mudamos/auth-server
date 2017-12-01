@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+require("dotenv").config({ silent: true });
+
 /**
  * Module dependencies.
  */

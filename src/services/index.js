@@ -1,5 +1,5 @@
 "use strict";
 
 module.exports = {
-  auth: require("./auth"),
+  log: require("./log"),
 };
