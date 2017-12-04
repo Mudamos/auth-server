@@ -6,7 +6,12 @@ const {
   scopeOrDefault,
 } = require("../../models/auth");
 
+const {
+  buildURL,
+} = require("../../utils");
+
 module.exports = ({
+  authorizeClient,
   csrf,
   ensureGrantDecisionWasNotTampered,
   ensureUserLoggedIn,
@@ -53,11 +58,29 @@ module.exports = ({
     fetchClient,
     validateOAuthAuthorizationRequest,
     ensureGrantDecisionWasNotTampered,
-    (req, res) => {
-      // TODO: everything is validated
-      //console.log("query", req.query);
-      //console.log("body", req.body);
-      res.send("weeeeeeeeeeeeeeee");
+    (req, res, next) => {
+      const { client, user } = req;
+      const { redirectUri, scope, state } = req.oauth;
+      const { decision } = req.body;
+      const allowed = decision === "allow";
+
+      if (!allowed) {
+        return res.redirect(buildURL(redirectUri, {
+          error: "access_denied",
+          error_description: "User denied access",
+        }));
+      }
+
+      authorizeClient({
+        client,
+        user,
+        redirectUri: redirectUri.href,
+        scope,
+        state,
+      })
+        .then(authCode => buildURL(redirectUri, { code: authCode.code, state }).href)
+        .then(uri => res.redirect(uri))
+        .catch(next);
     }
   );
 

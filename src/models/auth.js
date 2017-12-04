@@ -8,6 +8,10 @@ const {
   pipe,
 } = require("ramda");
 
+const crypto = require("crypto");
+const { promisify } = require("util");
+const randomBytes = promisify(crypto.randomBytes);
+
 const KNOWN_SCOPES = [
   "read:profile",
   "write:sign_message",
@@ -41,6 +45,12 @@ const isValidScope = scope =>
 
 const isValidReponseType = flip(contains)(["code", "token"]);
 
-module.exports.isValidReponseType = isValidReponseType;
-module.exports.isValidScope = isValidScope;
-module.exports.scopeOrDefault = scopeOrDefault;
+const generateToken = () =>
+  randomBytes(256).then(buffer => crypto.createHash("sha256").update(buffer).digest("hex"));
+
+module.exports = {
+  isValidReponseType,
+  isValidScope,
+  generateToken,
+  scopeOrDefault,
+};

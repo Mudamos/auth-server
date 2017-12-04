@@ -1,10 +1,13 @@
 "use strict";
 
+const { URL } = require("url");
+
 const {
   allPass,
   both,
   complement,
   equals,
+  forEachObjIndexed,
   is,
   isEmpty,
   isNil,
@@ -51,8 +54,20 @@ const underscore = humps.decamelize;
 
 const camelizeKeys = humps.camelizeKeys;
 
+const buildURL = (url, args = {}) => {
+  const uri = new URL(url);
+
+  forEachObjIndexed((value, key) => {
+    uri.searchParams.delete(key);
+    uri.searchParams.append(key, value);
+  }, args);
+
+  return uri;
+};
+
 module.exports = {
   buildQueryString,
+  buildURL,
   camelizeKeys,
   isBlank,
   isBlankString,

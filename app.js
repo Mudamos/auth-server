@@ -11,10 +11,12 @@ const sassMiddleware = require("node-sass-middleware");
 const config = require("./src/config")();
 const db = require("./src/db")(config);
 const {
+  AuthorizationCodeRepository,
   ClientRepository,
   UserRepository,
 } = require("./src/repositories");
 
+const authorizationCodeRepository = AuthorizationCodeRepository(db);
 const userRepository = UserRepository(db);
 const clientRepository = ClientRepository(db);
 
@@ -36,6 +38,7 @@ const {
 const logger = log(config);
 
 const {
+  authorizeClient,
   loginUser,
 } = require("./src/use-cases");
 
@@ -73,6 +76,7 @@ app.use("/auth", routes.auth({
 }));
 
 app.use("/api/v1", api.v1({
+  authorizeClient: authorizeClient({ authorizationCodeRepository, config }),
   csrf: csrf(),
   ensureGrantDecisionWasNotTampered: ensureGrantDecisionWasNotTampered({ logger }),
   ensureUserLoggedIn: ensureUserLoggedIn({ userRepository }),

@@ -5,7 +5,7 @@ const {
   flip,
 } = require("ramda");
 
-const { URL } = require("url");
+const { buildURL } = require("../utils");
 
 const {
   isValidReponseType,
@@ -14,13 +14,17 @@ const {
 
 const parseUri = uri => {
   if (!uri) throw new Error("Invalid uri");
-  return new URL(uri);
+  return buildURL(uri);
 };
 
 const renderErrorResponse = res => attrs => res.render("auth/error", attrs);
 
+const redirectWithResponse = res => (url, attrs = {}) =>
+  res.redirect(buildURL(url, attrs).href);
+
 module.exports = () => async (req, res, next) => {
   const renderError = renderErrorResponse(res);
+  const redirect = redirectWithResponse(res);
 
   const {
     client_id: clientId,
@@ -36,13 +40,6 @@ module.exports = () => async (req, res, next) => {
     return renderError({
       error: "invalid_request",
       error_description: "No client supplied",
-    });
-  }
-
-  if (!isValidReponseType(responseType)) {
-    return renderError({
-      error: "unsupported_response_type",
-      error_description: "Unsupported response type",
     });
   }
 
@@ -66,21 +63,28 @@ module.exports = () => async (req, res, next) => {
 
   const isValidUri = flip(contains)(client.redirectUris);
   if (!isValidUri(parsedUri.href)) {
-    return renderError({
+    return redirect(parsedUri, {
       error: "invalid_request",
       error_description: "Invalid redirect uri",
     });
   }
 
+  if (!isValidReponseType(responseType)) {
+    return redirect(parsedUri, {
+      error: "unsupported_response_type",
+      error_description: "Unsupported response type",
+    });
+  }
+
   if (!contains(responseType, client.grants)) {
-    return renderError({
+    return redirect(parsedUri, {
       error: "unauthorized_client",
       error_description: "Client is not authorized to request an authorization using this method",
     });
   }
 
   if (!isValidScope(scope)) {
-    return renderError({
+    return redirect(parsedUri, {
       error: "invalid_scope",
       error_description: "Invalid scope",
     });
