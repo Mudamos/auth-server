@@ -12,6 +12,7 @@ const {
 
 module.exports = ({
   authorizeClient,
+  authorizationCodeRepository,
   csrf,
   ensureGrantDecisionWasNotTampered,
   ensureUserLoggedIn,
@@ -21,6 +22,22 @@ module.exports = ({
 }) => {
   const app = express.Router();
 
+  const generateAuthorizationToken = (req, res, next) => {
+    const { client, user } = req;
+    const { redirectUri, scope, state } = req.oauth;
+
+    authorizeClient({
+      client,
+      user,
+      redirectUri: redirectUri.href,
+      scope,
+      state,
+    })
+      .then(authCode => buildURL(redirectUri, { code: authCode.code, state }).href)
+      .then(uri => res.redirect(uri))
+      .catch(next);
+  };
+
   app.get(
     "/authorize",
     sessionMiddleware,
@@ -28,25 +45,29 @@ module.exports = ({
     fetchClient,
     validateOAuthAuthorizationRequest,
     ensureUserLoggedIn,
-    (req, res) => {
+    (req, res, next) => {
       const { client, user } = req;
       const { scope } = req.oauth;
+      const scopes = scopeOrDefault(scope);
 
-      // TODO: implement this allowed flow
-      const hasAllowedBefore = false;
-      if (hasAllowedBefore) {
-        res.send("allowed before");
-      } else {
-        // So we can validate if request was tampered after
-        req.session.authorizationGrant = req.oauth;
+      authorizationCodeRepository
+        .hasAllowed({ clientId: client.id, userId: user.id, scopes })
+        .then(allowed => {
+          if (allowed) {
+            generateAuthorizationToken(req, res, next);
+          } else {
+            // So we can validate if request was tampered after
+            req.session.authorizationGrant = req.oauth;
 
-        res.render("auth/decision", {
-          client,
-          scopes: scopeOrDefault(scope),
-          user,
-          csrfToken: req.csrfToken(),
-        });
-      }
+            res.render("auth/decision", {
+              client,
+              scopes,
+              user,
+              csrfToken: req.csrfToken(),
+            });
+          }
+        })
+        .catch(next);
     }
   );
 
@@ -59,8 +80,7 @@ module.exports = ({
     validateOAuthAuthorizationRequest,
     ensureGrantDecisionWasNotTampered,
     (req, res, next) => {
-      const { client, user } = req;
-      const { redirectUri, scope, state } = req.oauth;
+      const { redirectUri } = req.oauth;
       const { decision } = req.body;
       const allowed = decision === "allow";
 
@@ -71,16 +91,7 @@ module.exports = ({
         }));
       }
 
-      authorizeClient({
-        client,
-        user,
-        redirectUri: redirectUri.href,
-        scope,
-        state,
-      })
-        .then(authCode => buildURL(redirectUri, { code: authCode.code, state }).href)
-        .then(uri => res.redirect(uri))
-        .catch(next);
+      generateAuthorizationToken(req, res, next);
     }
   );
 

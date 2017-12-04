@@ -77,6 +77,7 @@ app.use("/auth", routes.auth({
 
 app.use("/api/v1", api.v1({
   authorizeClient: authorizeClient({ authorizationCodeRepository, config }),
+  authorizationCodeRepository,
   csrf: csrf(),
   ensureGrantDecisionWasNotTampered: ensureGrantDecisionWasNotTampered({ logger }),
   ensureUserLoggedIn: ensureUserLoggedIn({ userRepository }),
