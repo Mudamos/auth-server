@@ -23,12 +23,15 @@ const parseScope = scope => {
   return scope
     ? scope.split(" ")
     : [];
-}
+};
 
-const scopeOrDefault = scope =>
-  isEmpty(parseScope(scope))
+const scopeOrDefault = scope => {
+  const givenScopes = parseScope(scope);
+
+  return isEmpty(givenScopes)
     ? DEFAULT_SCOPES
     : givenScopes;
+};
 
 const isValidScope = scope =>
   pipe(

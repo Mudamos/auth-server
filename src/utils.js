@@ -39,10 +39,10 @@ const buildQueryString = params =>
       if (Array.isArray(params[k])) {
         return params[k]
           .map(val => `${encodeURIComponent(k)}[]=${encodeURIComponent(val)}`)
-          .join("&")
+          .join("&");
       }
 
-      return `${encodeURIComponent(k)}=${encodeURIComponent(params[k])}`
+      return `${encodeURIComponent(k)}=${encodeURIComponent(params[k])}`;
     })
     .filter(value => not(isNil(value)))
     .join("&");

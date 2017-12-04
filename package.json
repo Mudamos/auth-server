@@ -6,6 +6,7 @@
   },
   "private": true,
   "scripts": {
+    "lint": "./node_modules/.bin/eslint .",
     "start": "node ./bin/www"
   },
   "dependencies": {
@@ -32,6 +33,52 @@
     "winston": "^2.4.0"
   },
   "devDependencies": {
+    "eslint": "^4.12.1",
     "nodemon": "^1.12.1"
+  },
+  "eslintConfig": {
+    "parserOptions": {
+      "ecmaVersion": 8,
+      "ecmaFeatures": {
+        "classes": true,
+        "experimentalObjectRestSpread": true
+      }
+    },
+    "env": {
+      "es6": true,
+      "node": true
+    },
+    "extends": [
+      "eslint:recommended"
+    ],
+    "rules": {
+      "comma-dangle": [
+        "error",
+        "always-multiline"
+      ],
+      "indent": [
+        "error",
+        2
+      ],
+      "no-unused-vars": [
+        "error",
+        {
+          "argsIgnorePattern": "_",
+          "varsIgnorePattern": "_"
+        }
+      ],
+      "quotes": [
+        "error",
+        "double"
+      ],
+      "semi": [
+        "error",
+        "always"
+      ],
+      "strict": [
+        "error",
+        "global"
+      ]
+    }
   }
 }

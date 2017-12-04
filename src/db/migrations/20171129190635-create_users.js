@@ -25,6 +25,6 @@ module.exports = {
       updatedAt: Sequelize.DATE,
     }),
 
-  down: (queryInterface, Sequelize) =>
+  down: (queryInterface, _Sequelize) =>
     queryInterface.dropTable("users"),
 };

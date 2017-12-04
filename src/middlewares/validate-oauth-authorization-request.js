@@ -15,7 +15,7 @@ const {
 const parseUri = uri => {
   if (!uri) throw new Error("Invalid uri");
   return new URL(uri);
-}
+};
 
 const renderErrorResponse = res => attrs => res.render("auth/error", attrs);
 

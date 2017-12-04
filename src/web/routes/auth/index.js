@@ -2,15 +2,10 @@
 
 const express = require("express");
 
-const {
-  scopeOrDefault,
-} = require("../../../models/auth");
-
 module.exports = ({
   ensureUserLoggedIn,
   loginUser,
   sessionMiddleware,
-  validateOAuthAuthorizationRequest,
 }) => {
   const app = express.Router();
 
@@ -44,22 +39,8 @@ module.exports = ({
           // TODO: Better validation
           error: e,
         });
-      })
+      });
   });
-
- // app.get("decision", validateOAuthAuthorizationRequest, ensureUserLoggedIn, (req, res) => {
- //   const {
- //     scope,
- //   } = req.query;
-
- //   const { client, user } = req;
-
- //   res.render("auth/decision", {
- //     client,
- //     scopes: scopeOrDefault(scope),
- //     user,
- //   });
- // });
 
   app.get("/success", ensureUserLoggedIn, (_req, res) => res.send("Logado com sucesso"));
 

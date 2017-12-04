@@ -15,5 +15,5 @@ module.exports.loginUser = ({ userRepository }) => async ({ email, password }) =
   }
 
   // TODO: better error handling and validation
-  throw "Failed"
+  throw "Failed";
 };

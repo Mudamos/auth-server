@@ -1,3 +1,5 @@
+"use strict";
+
 const express = require("express");
 const path = require("path");
 const favicon = require("serve-favicon");
@@ -48,8 +50,7 @@ const app = express();
 app.set("views", path.join(__dirname, "src/web/views"));
 app.set("view engine", "pug");
 
-// uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, "public", "favicon.ico")));
+app.use(favicon(path.join(__dirname, "public", "favicon.ico")));
 app.use(addLogger({ logger }));
 app.use(requestId());
 app.use(requestLogger());
@@ -60,7 +61,7 @@ app.use(sassMiddleware({
   src: path.join(__dirname, "public"),
   dest: path.join(__dirname, "public"),
   indentedSyntax: true, // true = .sass and false = .scss
-  sourceMap: true
+  sourceMap: true,
 }));
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -69,7 +70,6 @@ app.use("/auth", routes.auth({
   ensureUserLoggedIn: ensureUserLoggedIn({ userRepository }),
   loginUser: loginUser({ userRepository }),
   sessionMiddleware,
-  validateOAuthAuthorizationRequest: validateOAuthAuthorizationRequest(),
 }));
 
 app.use("/api/v1", api.v1({
@@ -89,7 +89,7 @@ app.use(function(req, res, next) {
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function(err, req, res, _next) {
   // TODO: better error handling
   const status = err.status
     || (err.message === "Not found" ? 404 : null)

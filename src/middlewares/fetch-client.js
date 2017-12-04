@@ -8,7 +8,7 @@ module.exports = ({ clientRepository }) => async (req, res, next) => {
   if (clientId) {
     try {
       const client = await clientRepository.findById(clientId)
-        .catch(e => e.message === "Not found" ? null : Promise.reject(e))
+        .catch(e => e.message === "Not found" ? null : Promise.reject(e));
 
       req.client = client;
     } catch (e) {
