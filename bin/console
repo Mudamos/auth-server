@@ -47,10 +47,12 @@ const db = require("../src/db")(config);
 const tables = require("../src/tables")(db);
 
 const {
+  AuthorizationCodeRepository,
   ClientRepository,
   UserRepository,
 } = require("../src/repositories");
 
+const authorizationCodeRepository = AuthorizationCodeRepository(db);
 const userRepository = UserRepository(db);
 const clientRepository = ClientRepository(db);
 
@@ -69,6 +71,7 @@ Object.keys(ramda).forEach(key => replServer.context[key] = ramda[key]);
 Object.keys(tables).forEach(key => replServer.context[key] = tables[key]);
 Object.keys(models).forEach(key => replServer.context[key] = models[key]);
 
+replServer.context.authorizationCodeRepository = authorizationCodeRepository;
 replServer.context.clientRepository = clientRepository;
 replServer.context.config = config;
 replServer.context.createUser = createUser({ userRepository });

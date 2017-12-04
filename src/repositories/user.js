@@ -57,3 +57,5 @@ module.exports = sequelize => {
     existsByEmail: existsByEmail(tables(sequelize)),
   };
 };
+
+module.exports.deserializeUser = deserializeUser;

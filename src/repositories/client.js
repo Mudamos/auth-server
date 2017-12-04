@@ -50,3 +50,5 @@ module.exports = sequelize => {
     findByIdAndSecret: findByIdAndSecret(tables(sequelize)),
   };
 };
+
+module.exports.deserializeClient = deserializeClient;
