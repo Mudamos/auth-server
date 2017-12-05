@@ -57,6 +57,7 @@ const userRepository = UserRepository(db);
 const clientRepository = ClientRepository(db);
 
 const {
+  createClient,
   createUser,
 } = require("../src/use-cases");
 
@@ -74,6 +75,7 @@ Object.keys(models).forEach(key => replServer.context[key] = models[key]);
 replServer.context.authorizationCodeRepository = authorizationCodeRepository;
 replServer.context.clientRepository = clientRepository;
 replServer.context.config = config;
+replServer.context.createClient = createClient({ clientRepository });
 replServer.context.createUser = createUser({ userRepository });
 replServer.context.db = db;
 replServer.context.logger = logger;
