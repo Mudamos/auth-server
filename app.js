@@ -3,8 +3,6 @@
 const express = require("express");
 const path = require("path");
 const favicon = require("serve-favicon");
-// TODO: we should not need this
-const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 const sassMiddleware = require("node-sass-middleware");
 
@@ -59,7 +57,6 @@ app.use(requestId());
 app.use(requestLogger());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
 app.use(sassMiddleware({
   src: path.join(__dirname, "public"),
   dest: path.join(__dirname, "public"),

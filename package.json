@@ -6,13 +6,13 @@
   },
   "private": true,
   "scripts": {
+    "hotreload": "./node_modules/nodemon/bin/nodemon.js",
     "lint": "./node_modules/.bin/eslint .",
     "start": "node ./bin/www"
   },
   "dependencies": {
     "bcrypt": "^1.0.3",
     "body-parser": "~1.18.2",
-    "cookie-parser": "~1.4.3",
     "cookie-session": "^2.0.0-beta.3",
     "csurf": "^1.9.0",
     "debug": "~2.6.9",
