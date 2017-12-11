@@ -9,17 +9,20 @@ const sassMiddleware = require("node-sass-middleware");
 const config = require("./src/config")();
 const db = require("./src/db")(config);
 const {
+  AccessTokenRepository,
   AuthorizationCodeRepository,
   ClientRepository,
   UserRepository,
 } = require("./src/repositories");
 
+const accessTokenRepository = AccessTokenRepository(db);
 const authorizationCodeRepository = AuthorizationCodeRepository(db);
 const userRepository = UserRepository(db);
 const clientRepository = ClientRepository(db);
 
 const {
   addLogger,
+  authenticateClient,
   csrf,
   ensureGrantDecisionWasNotTampered,
   ensureUserLoggedIn,
@@ -28,6 +31,7 @@ const {
   requestLogger,
   session,
   validateOAuthAuthorizationRequest,
+  validateOAuthTokenRequest,
 } = require("./src/middlewares");
 
 const {
@@ -37,6 +41,7 @@ const logger = log(config);
 
 const {
   authorizeClient,
+  createAccessToken,
   loginUser,
 } = require("./src/use-cases");
 
@@ -46,6 +51,7 @@ const routes = require("./src/web/routes");
 const api = require("./src/api");
 
 const app = express();
+app.disable("x-powered-by");
 
 // view engine setup
 app.set("views", path.join(__dirname, "src/web/views"));
@@ -73,14 +79,17 @@ app.use("/auth", routes.auth({
 }));
 
 app.use("/api/v1", api.v1({
+  authenticateClient: authenticateClient({ clientRepository }),
   authorizeClient: authorizeClient({ authorizationCodeRepository, config }),
   authorizationCodeRepository,
+  createAccessToken: createAccessToken({ accessTokenRepository, config, }),
   csrf: csrf(),
   ensureGrantDecisionWasNotTampered: ensureGrantDecisionWasNotTampered({ logger }),
   ensureUserLoggedIn: ensureUserLoggedIn({ userRepository }),
   fetchClient: fetchClient({ clientRepository }),
   sessionMiddleware,
   validateOAuthAuthorizationRequest: validateOAuthAuthorizationRequest(),
+  validateOAuthTokenRequest: validateOAuthTokenRequest({ authorizationCodeRepository }),
 }));
 
 // catch 404 and forward to error handler

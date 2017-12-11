@@ -1,6 +1,7 @@
 "use strict";
 
 const express = require("express");
+const moment = require("moment");
 
 const {
   scopeOrDefault,
@@ -8,17 +9,21 @@ const {
 
 const {
   buildURL,
+  dropNilValues,
 } = require("../../utils");
 
 module.exports = ({
+  authenticateClient,
   authorizeClient,
   authorizationCodeRepository,
+  createAccessToken,
   csrf,
   ensureGrantDecisionWasNotTampered,
   ensureUserLoggedIn,
   fetchClient,
   sessionMiddleware,
   validateOAuthAuthorizationRequest,
+  validateOAuthTokenRequest,
 }) => {
   const app = express.Router();
 
@@ -92,6 +97,40 @@ module.exports = ({
       }
 
       generateAuthorizationToken(req, res, next);
+    }
+  );
+
+  app.post(
+    "/token",
+    authenticateClient,
+    validateOAuthTokenRequest,
+    (req, res, next) => {
+      const { client } = req;
+      const {
+        userId,
+        scope,
+        includeRefreshToken,
+        previousAccessTokenId,
+      } = req.oauth;
+
+      const clientId = client.id;
+
+      createAccessToken({ clientId, userId, scope, includeRefreshToken, previousAccessTokenId })
+        .then(accessToken => {
+          const expiresIn = moment(accessToken.tokenExpiresAt).diff(moment(), "seconds");
+
+          res.set("Cache-Control", "no-store");
+          res.set("Pragma", "no-cache");
+
+          res.json(dropNilValues({
+            access_token: accessToken.token,
+            expires_in: expiresIn,
+            refresh_token: accessToken.refreshToken,
+            scope: accessToken.scopes.join(" "),
+            token_type: "Bearer",
+          }));
+        })
+        .catch(next);
     }
   );
 

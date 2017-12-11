@@ -42,16 +42,21 @@ replServer.on("exit", () => {
   process.exit();
 });
 
+const moment = require("moment");
+
 const config = require("../src/config")();
 const db = require("../src/db")(config);
 const tables = require("../src/tables")(db);
 
 const {
+  AccessTokenRepository,
   AuthorizationCodeRepository,
   ClientRepository,
   UserRepository,
 } = require("../src/repositories");
 
+
+const accessTokenRepository = AccessTokenRepository(db);
 const authorizationCodeRepository = AuthorizationCodeRepository(db);
 const userRepository = UserRepository(db);
 const clientRepository = ClientRepository(db);
@@ -72,6 +77,7 @@ Object.keys(ramda).forEach(key => replServer.context[key] = ramda[key]);
 Object.keys(tables).forEach(key => replServer.context[key] = tables[key]);
 Object.keys(models).forEach(key => replServer.context[key] = models[key]);
 
+replServer.context.accessTokenRepository = accessTokenRepository;
 replServer.context.authorizationCodeRepository = authorizationCodeRepository;
 replServer.context.clientRepository = clientRepository;
 replServer.context.config = config;
@@ -79,4 +85,5 @@ replServer.context.createClient = createClient({ clientRepository });
 replServer.context.createUser = createUser({ userRepository });
 replServer.context.db = db;
 replServer.context.logger = logger;
+replServer.context.moment = moment;
 replServer.context.userRepository = userRepository;

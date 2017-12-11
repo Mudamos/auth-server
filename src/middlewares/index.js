@@ -2,6 +2,7 @@
 
 module.exports = {
   addLogger: require("./logger"),
+  authenticateClient: require("./authenticate-client"),
   csrf: require("./csrf"),
   ensureUserLoggedIn: require("./ensure-user-logged-in"),
   ensureGrantDecisionWasNotTampered: require("./ensure-grant-decision-was-not-tampered"),
@@ -10,4 +11,5 @@ module.exports = {
   requestLogger: require("./request-logger"),
   session: require("./session"),
   validateOAuthAuthorizationRequest: require("./validate-oauth-authorization-request"),
+  validateOAuthTokenRequest: require("./validate-oauth-token-request"),
 };

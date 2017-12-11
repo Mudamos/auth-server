@@ -68,9 +68,22 @@ const hasAllowed = ({ authorizationCodesTable }) => ({ clientId, scopes, userId 
     .then(authCode => !!authCode);
 };
 
+const findByCode = ({ authorizationCodesTable, clientsTable, usersTable }) => code =>
+  authorizationCodesTable
+    .findOne({
+      where: { code },
+      include: [
+        { model: clientsTable },
+        { model: usersTable },
+      ],
+    })
+    .then(rejectIfFalsy())
+    .then(deserializeAuthorizationCode);
+
 module.exports = sequelize => {
   return {
     create: create(tables(sequelize)),
+    findByCode: findByCode(tables(sequelize)),
     findById: findById(tables(sequelize)),
     hasAllowed: hasAllowed(tables(sequelize)),
   };

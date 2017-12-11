@@ -12,6 +12,7 @@ const {
   isEmpty,
   isNil,
   not,
+  reject,
   test,
 } = require("ramda");
 
@@ -65,10 +66,16 @@ const buildURL = (url, args = {}) => {
   return uri;
 };
 
+const different = complement(equals);
+
+const dropNilValues = reject(isNil);
+
 module.exports = {
   buildQueryString,
   buildURL,
   camelizeKeys,
+  different,
+  dropNilValues,
   isBlank,
   isBlankString,
   isInvalidNumber,

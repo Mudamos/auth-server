@@ -21,6 +21,12 @@ const DEFAULT_SCOPES = [
   "read:profile",
 ];
 
+const GRANT_TYPES = [
+  "authorization_code",
+  "password",
+  "refresh_token",
+];
+
 const parseScope = scope => {
   if (Array.isArray(scope)) return scope;
 
@@ -45,10 +51,13 @@ const isValidScope = scope =>
 
 const isValidReponseType = flip(contains)(["code", "token"]);
 
+const isValidGrantType = flip(contains)(GRANT_TYPES);
+
 const generateToken = () =>
   randomBytes(256).then(buffer => crypto.createHash("sha256").update(buffer).digest("hex"));
 
 module.exports = {
+  isValidGrantType,
   isValidReponseType,
   isValidScope,
   generateToken,
