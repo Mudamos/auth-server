@@ -1,5 +1,9 @@
 "use strict";
 
+const {
+  always,
+} = require("ramda");
+
 const tables = require("../tables");
 const { AuthorizationCode } = require("../models");
 const { deserializeClient } = require("./client");
@@ -80,11 +84,20 @@ const findByCode = ({ authorizationCodesTable, clientsTable, usersTable }) => co
     .then(rejectIfFalsy())
     .then(deserializeAuthorizationCode);
 
+const removeById = ({ authorizationCodesTable }) => (id, { transaction } = {}) =>
+  authorizationCodesTable
+    .destroy({
+      where: { id },
+      transaction,
+    })
+    .then(always(true));
+
 module.exports = sequelize => {
   return {
     create: create(tables(sequelize)),
     findByCode: findByCode(tables(sequelize)),
     findById: findById(tables(sequelize)),
     hasAllowed: hasAllowed(tables(sequelize)),
+    removeById: removeById(tables(sequelize)),
   };
 };

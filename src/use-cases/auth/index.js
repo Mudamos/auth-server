@@ -39,7 +39,8 @@ module.exports.authorizeClient = ({ authorizationCodeRepository, config }) => as
   return authCode;
 };
 
-module.exports.createAccessToken = ({ accessTokenRepository, config }) => async ({
+module.exports.createAccessToken = ({ accessTokenRepository, authorizationCodeRepository, config }) => async ({
+  authorizationCodeId,
   clientId,
   userId,
   scope,
@@ -47,7 +48,7 @@ module.exports.createAccessToken = ({ accessTokenRepository, config }) => async 
   includeRefreshToken = false,
 }) => {
   const tokenExpirationDuration = config("ACCESS_TOKEN_EXPIRATION_DURATION_IN_DAYS");
-  const refreshTokenExpirationDuration = config("REFRESH_TOKEN_EXPIRATION_DURATION_IN_DAYS")
+  const refreshTokenExpirationDuration = config("REFRESH_TOKEN_EXPIRATION_DURATION_IN_DAYS");
 
   const tokenExpiresAt = moment().add(tokenExpirationDuration, "days").toDate();
   const refreshTokenExpiresAt = moment().add(refreshTokenExpirationDuration, "days").toDate();
@@ -55,20 +56,21 @@ module.exports.createAccessToken = ({ accessTokenRepository, config }) => async 
 
   const [token, refreshToken] = await Promise.all([generateToken(), generateToken()]);
 
-  // TODO: update authorization code
-  // mark it as used or simply delete it
-  // TODO: once a refreshtoken is used it must me marked as so
-  // delete it
-
   return accessTokenRepository.transaction(async transaction => {
     const attrs = { clientId, userId, scopes, token, tokenExpiresAt, transaction };
 
-    const accessToken = await includeRefreshToken
-      ? accessTokenRepository.create({ ...attrs, refreshToken, refreshTokenExpiresAt })
-      : accessTokenRepository.create(attrs);
+    const accessToken = includeRefreshToken
+      ? await accessTokenRepository.create({ ...attrs, refreshToken, refreshTokenExpiresAt })
+      : await accessTokenRepository.create(attrs);
+
+    if (authorizationCodeId) {
+      await authorizationCodeRepository.removeById(authorizationCodeId, { transaction });
+    }
 
     if (previousAccessTokenId) {
-      // delete access token
+      await accessTokenRepository.removeById(previousAccessTokenId, { transaction });
     }
+
+    return accessToken;
   });
 };

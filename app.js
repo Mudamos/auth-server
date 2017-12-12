@@ -82,14 +82,18 @@ app.use("/api/v1", api.v1({
   authenticateClient: authenticateClient({ clientRepository }),
   authorizeClient: authorizeClient({ authorizationCodeRepository, config }),
   authorizationCodeRepository,
-  createAccessToken: createAccessToken({ accessTokenRepository, config, }),
+  createAccessToken: createAccessToken({ accessTokenRepository, authorizationCodeRepository, config }),
   csrf: csrf(),
   ensureGrantDecisionWasNotTampered: ensureGrantDecisionWasNotTampered({ logger }),
   ensureUserLoggedIn: ensureUserLoggedIn({ userRepository }),
   fetchClient: fetchClient({ clientRepository }),
   sessionMiddleware,
   validateOAuthAuthorizationRequest: validateOAuthAuthorizationRequest(),
-  validateOAuthTokenRequest: validateOAuthTokenRequest({ authorizationCodeRepository }),
+  validateOAuthTokenRequest: validateOAuthTokenRequest({
+    accessTokenRepository,
+    authorizationCodeRepository,
+    loginUser: loginUser({ userRepository }),
+  }),
 }));
 
 // catch 404 and forward to error handler

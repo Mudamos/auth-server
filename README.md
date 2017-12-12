@@ -12,7 +12,8 @@ $ cp .env.sample .env
 
 Configure agora as env vars de acordo com sua necessidade.
 
-- AUTHORIZATION_CODE_EXPIRATION_TIME_IN_MINUTES: tempo em minutos que o token (code) do fluxo de *authorization grant* expirará.
+- ACCESS_TOKEN_EXPIRATION_DURATION_IN_DAYS: tempo em dias que o token de acesso (access token) expirará
+- AUTHORIZATION_CODE_EXPIRATION_DURATION_IN_MINUTES: tempo em minutos que o token (code) do fluxo de *authorization grant* expirará
 - DB_HOST: host do banco postgres primário
 - DB_USER: usuário do banco
 - DB_PASS: password do banco
@@ -23,6 +24,7 @@ Configure agora as env vars de acordo com sua necessidade.
 - DB_LOGGING: boleano (loga queries do banco)
 - NODE_ENV: environment da app
 - PORT: porta que o serviço web rodará
+- REFRESH_TOKEN_EXPIRATION_DURATION_IN_DAYS: tempo em dias que o resfresh token expirará
 - SESSION_SECRET_KEYS: valor separado por vírgulas que representa chaves que irão ser utilizadas para encriptar o cookie de sessão do usuário
   - obs: por padrão a primeira chave será usada em novos cookies, mas as chaves antigas podem ser utilizadas para desencriptar cookies antigos
 
@@ -117,7 +119,7 @@ Agora execute passando os dados de acordo com o necessário
 ```
 $ createClient({
   // both response types allowed and grants
-  grants: ["authorization_code", "password", "code", "token"],
+  grants: ["authorization_code", "password", "refresh_token", "code", "token"],
   name: "A nice client",
   redirectUris: ["http://localhost:4001/result", "http://localhost:4001/resultoauth"],
 })
@@ -131,7 +133,7 @@ Exemplo:
 { client:
    { id: '4',
      createdAt: 2017-12-05T10:45:18.416Z,
-     grants: [ 'authorization_code', 'password' 'code', 'token' ],
+     grants: [ 'authorization_code', 'password', 'refresh_token', 'code', 'token' ],
      name: 'A nice client',
      redirectUris:
       [ 'http://localhost:4001/result',

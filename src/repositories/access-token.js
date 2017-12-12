@@ -1,5 +1,9 @@
 "use strict";
 
+const {
+  always,
+} = require("ramda");
+
 const tables = require("../tables");
 const { AccessToken } = require("../models");
 
@@ -70,6 +74,14 @@ const findByClientIdAndRefreshToken = ({ accessTokensTable }) => ({ clientId, re
     .then(rejectIfFalsy())
     .then(deserializeAccessToken);
 
+const removeById = ({ accessTokensTable }) => (id, { transaction } = {}) =>
+  accessTokensTable
+    .destroy({
+      where: { id },
+      transaction,
+    })
+    .then(always(true));
+
 module.exports = sequelize => {
   return {
     create: create(tables(sequelize)),
@@ -77,6 +89,7 @@ module.exports = sequelize => {
     findByRefreshToken: findByRefreshToken(tables(sequelize)),
     findByClientIdAndRefreshToken: findByClientIdAndRefreshToken(tables(sequelize)),
     findByToken: findByToken(tables(sequelize)),
+    removeById: removeById(tables(sequelize)),
     transaction: (...args) => sequelize.transaction(...args),
   };
 };

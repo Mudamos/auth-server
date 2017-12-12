@@ -107,6 +107,7 @@ module.exports = ({
     (req, res, next) => {
       const { client } = req;
       const {
+        authorizationCodeId,
         userId,
         scope,
         includeRefreshToken,
@@ -115,7 +116,14 @@ module.exports = ({
 
       const clientId = client.id;
 
-      createAccessToken({ clientId, userId, scope, includeRefreshToken, previousAccessTokenId })
+      createAccessToken({
+        clientId,
+        userId,
+        scope,
+        includeRefreshToken,
+        authorizationCodeId,
+        previousAccessTokenId,
+      })
         .then(accessToken => {
           const expiresIn = moment(accessToken.tokenExpiresAt).diff(moment(), "seconds");
 

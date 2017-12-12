@@ -26,7 +26,7 @@ const badRequest = res => ({ error, error_description }) =>
     error_description,
   });
 
-module.exports = ({ authorizationCodeRepository, loginUser }) => async (req, res, next) => {
+module.exports = ({ accessTokenRepository, authorizationCodeRepository, loginUser }) => async (req, res, next) => {
   const errorResponse = badRequest(res);
   const {
     grant_type: grantType,
@@ -90,7 +90,7 @@ module.exports = ({ authorizationCodeRepository, loginUser }) => async (req, res
         });
       }
 
-      req.oauth.authorizationCode = authCode;
+      req.oauth.authorizationCodeId = authCode.id;
       req.oauth.userId = authCode.user.id;
       req.oauth.scope = authCode.scopes.join(" ");
     } catch (e) {
